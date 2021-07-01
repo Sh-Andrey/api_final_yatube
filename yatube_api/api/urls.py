@@ -12,7 +12,7 @@ v1_router.register(
     basename='Posts'
 )
 v1_router.register(
-    r'posts/(?P<id>\d+)/comments', 
+    r'posts/(?P<post_id>\d+)/comments', 
     CommentViewSet, 
     basename='Comments',
 )
