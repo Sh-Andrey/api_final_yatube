@@ -26,8 +26,7 @@ v1_router.register(
     r'follow',
     FollowViewSet,
     basename='Followers'
-) 
-
+)
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
