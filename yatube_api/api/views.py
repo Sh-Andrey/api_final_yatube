@@ -10,8 +10,8 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
-AUTHENTICATED = (IsAuthenticated, IsOwnerOrReadOnly)
 AUTHENTICATED_OR_READ_ONLY = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+AUTHENTICATED = (IsAuthenticated, IsOwnerOrReadOnly)
 
 
 class CreateListGenericViewSet(mixins.CreateModelMixin, 
@@ -31,6 +31,12 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
+@permission_classes(AUTHENTICATED_OR_READ_ONLY)
+class GroupViewSet(CreateListGenericViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
 @permission_classes(AUTHENTICATED)
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
@@ -44,18 +50,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-@permission_classes(AUTHENTICATED_OR_READ_ONLY)
-class GroupViewSet(CreateListGenericViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-
 @permission_classes(AUTHENTICATED)
 class FollowViewSet(CreateListGenericViewSet):
     serializer_class = FollowSerializer
     filter_backends = [filters.SearchFilter]
     filterset_fields = ['following', ]
-    search_fields = ['user__username', ]
+    search_fields = ['user__username', 'following__username']
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user)
