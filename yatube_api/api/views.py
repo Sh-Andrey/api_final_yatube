@@ -1,4 +1,3 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import get_object_or_404
@@ -24,8 +23,7 @@ class CreateListGenericViewSet(mixins.CreateModelMixin,
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['group', ]
+    filterset_fields = ('group',)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -54,8 +52,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class FollowViewSet(CreateListGenericViewSet):
     serializer_class = FollowSerializer
     filter_backends = [filters.SearchFilter]
-    filterset_fields = ['following', ]
-    search_fields = ['user__username', 'following__username']
+    search_fields = ('=user__username', '=following__username')
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user)
