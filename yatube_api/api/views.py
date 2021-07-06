@@ -5,12 +5,20 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
 from .models import Follow, Group, Post, User
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
-AUTHENTICATED_OR_READ_ONLY = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
-AUTHENTICATED = (IsAuthenticated, IsOwnerOrReadOnly)
+
+UNAUTHORIZED_USERS_OR_READ_ONLY = (
+    IsAuthenticatedOrReadOnly, 
+    IsAuthorOrReadOnly
+)
+
+ONLY_AUTHENTICATED_USERS = (
+    IsAuthenticated, 
+    IsAuthorOrReadOnly
+)
 
 
 class CreateListGenericViewSet(mixins.CreateModelMixin,
@@ -19,7 +27,7 @@ class CreateListGenericViewSet(mixins.CreateModelMixin,
     pass
 
 
-@permission_classes(AUTHENTICATED_OR_READ_ONLY)
+@permission_classes(UNAUTHORIZED_USERS_OR_READ_ONLY)
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -29,13 +37,13 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-@permission_classes(AUTHENTICATED_OR_READ_ONLY)
+@permission_classes([IsAuthenticatedOrReadOnly])
 class GroupViewSet(CreateListGenericViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
-@permission_classes(AUTHENTICATED)
+@permission_classes(ONLY_AUTHENTICATED_USERS)
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
@@ -48,11 +56,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-@permission_classes(AUTHENTICATED)
+@permission_classes(ONLY_AUTHENTICATED_USERS)
 class FollowViewSet(CreateListGenericViewSet):
     serializer_class = FollowSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ('=user__username', '=following__username')
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=user__username',)
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user)
