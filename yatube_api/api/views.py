@@ -11,12 +11,12 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
 
 
 UNAUTHORIZED_USERS_OR_READ_ONLY = (
-    IsAuthenticatedOrReadOnly, 
+    IsAuthenticatedOrReadOnly,
     IsAuthorOrReadOnly
 )
 
 ONLY_AUTHENTICATED_USERS = (
-    IsAuthenticated, 
+    IsAuthenticated,
     IsAuthorOrReadOnly
 )
 

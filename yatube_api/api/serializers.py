@@ -44,7 +44,7 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault(),
     )
-    
+
     class Meta:
         fields = ('user', 'following')
         model = Follow
