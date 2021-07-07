@@ -26,4 +26,4 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('following', 'user')
-    search_fields = ('user__username',)
+    search_fields = ('user__username', 'following__username')

@@ -10,24 +10,13 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
 
-UNAUTHORIZED_USERS_OR_READ_ONLY = (
-    IsAuthenticatedOrReadOnly,
-    IsAuthorOrReadOnly
-)
-
-ONLY_AUTHENTICATED_USERS = (
-    IsAuthenticated,
-    IsAuthorOrReadOnly
-)
-
-
 class CreateListGenericViewSet(mixins.CreateModelMixin,
                                mixins.ListModelMixin,
                                viewsets.GenericViewSet):
     pass
 
 
-@permission_classes(UNAUTHORIZED_USERS_OR_READ_ONLY)
+@permission_classes([IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly])
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -43,7 +32,7 @@ class GroupViewSet(CreateListGenericViewSet):
     serializer_class = GroupSerializer
 
 
-@permission_classes(ONLY_AUTHENTICATED_USERS)
+@permission_classes([IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly])
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
@@ -56,7 +45,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-@permission_classes(ONLY_AUTHENTICATED_USERS)
+@permission_classes([IsAuthenticated])
 class FollowViewSet(CreateListGenericViewSet):
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter,)
